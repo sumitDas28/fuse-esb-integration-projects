@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0"
+	xmlns:camel="https://camel.apache.org/schema/blueprint"
+	xmlns:camel-cxf="http://camel.apache.org/schema/blueprint/cxf"
+	xmlns:cm="http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.1.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.osgi.org/xmlns/blueprint/v1.0.0 https://www.osgi.org/xmlns/blueprint/v1.0.0/blueprint.xsd              
+    		  					http://camel.apache.org/schema/blueprint https://camel.apache.org/schema/blueprint/camel-blueprint.xsd">
+	<!-- CXF servers -->
+	<camel-cxf:rsServer address="/learnjava/api"
+		id="service" loggingFeatureEnabled="true">
+		<camel-cxf:serviceBeans>
+			<bean
+				class="com.sumit.learnjava.restapi.service.EmployeeService" />
+		</camel-cxf:serviceBeans>
+		<camel-cxf:providers>
+			<bean
+				class="com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider" />
+		</camel-cxf:providers>
+	</camel-cxf:rsServer>
+
+
+	<camelContext id="_context1"
+		xmlns="http://camel.apache.org/schema/blueprint">
+		<route id="_route_rest_service">
+			<from id="_from_rest_service"
+				uri="cxfrs:bean:service?loggingFeatureEnabled =true" />
+			<when id="_when1">
+				<simple>${in.header.operationName} == "getAllEmployees"</simple>
+				<to id="_to1" uri="direct:getAllEmployees" />
+			</when>
+			<when id="_when2">
+				<simple>${in.header.operationName} == "getEmployeeById"</simple>
+				<to id="_to2" uri="direct:getEmployeeById" />
+			</when>
+			<when id="_when3">
+				<simple>${in.header.operationName} == "addEmployee"</simple>
+				<to id="_to3" uri="direct:addEmployee" />
+			</when>
+			<when id="_when4">
+				<simple>${in.header.operationName} == "updateEmployee"</simple>
+				<to id="_to4" uri="direct:updateEmployee" />
+			</when>
+			<when id="_when5">
+				<simple>${in.header.operationName} == "deleteEmployee"</simple>
+				<to id="_to5" uri="direct:deleteEmployee" />
+			</when>
+		</route>
+		<route id="_route1">
+			<from id="_from1" uri="direct:getAllEmployees" />
+			<bean method="getAllEmployees" ref="employeeServiceProcessor"/>
+		</route>
+		<route id="_route2">
+			<from id="_from2" uri="direct:getEmployeeById" />
+			<bean method="getEmployeeById" ref="employeeServiceProcessor"/>
+		</route>
+		<route id="_route3">
+			<from id="_from3" uri="direct:addEmployee" />
+			<bean method="addEmployee" ref="employeeServiceProcessor"/>
+		</route>
+		<route id="_route4">
+			<from id="_from4" uri="direct:updateEmployee" />
+			<bean method="updateEmployee" ref="employeeServiceProcessor"/>
+		</route>
+		<route id="_route5">
+			<from id="_from5" uri="direct:deleteEmployee" />
+			<bean method="deleteEmployee" ref="employeeServiceProcessor"/>
+		</route>
+	</camelContext>
+</blueprint>
+
